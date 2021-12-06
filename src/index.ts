@@ -118,7 +118,7 @@ class Tetris {
     private _currentSpeed = 1; // rows per second
     private _board: number[][];
     private _score: number = 0;
-    private _currentShape: Shape;
+    private _currentShape: Shape|null = null;
     private _gameOver: boolean = false;
 
     constructor(rows: number, cols: number, score: number = 0) {
@@ -162,7 +162,7 @@ class Tetris {
         }
     }
 
-    public update(ticks) {
+    public update(ticks: number) {
         if (!this._currentShape) {
             this._currentShape = this._getRandomShape();
             return;
@@ -249,15 +249,15 @@ class Tetris {
         return shape;
     }
 
-    private _getRandom(min, max) {
+    private _getRandom(min: number, max: number) {
         return Math.random() * (max - min) + min;
     }
 }
 
 class Game {
     private _tetris: Tetris;
-    private _ctx: CanvasRenderingContext2D;
-    private _last: Date;
+    private _ctx: CanvasRenderingContext2D | null;
+    private _last: Date | null = null;
     private _active: boolean = false;
 
     constructor(canvas: HTMLCanvasElement) {
@@ -288,7 +288,7 @@ class Game {
     }
 
     private _draw() {
-        this._tetris.draw(this._ctx);
+        this._tetris.draw(this._ctx as CanvasRenderingContext2D);
     }
 
     private _keyDown(e: KeyboardEvent) {
