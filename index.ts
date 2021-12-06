@@ -58,30 +58,30 @@ class Shape {
     }
 
 
-    /// 1 2 3     4 1    00 01 02    10 00
-    /// 4 5 6  => 5 2    10 11 12 => 11 01
-    ///           6 3                12 02
+    /// 1 2 3     4 1    00 01 02    10(00) 00(01)
+    /// 4 5 6  => 5 2    10 11 12 => 11(10) 01(11)
+    ///           6 3                12(20) 02(21)
     rotateRight(): void {
-        const newPoints = [];
+        console.log('rotate right');
+        const newPoints = (<any>Array(this.points[0].length)).fill(0).map(() => (<any>Array(this.points.length)).fill(0));
         for (let i = 0; i < this.points.length; i++) {
-            newPoints[i] = [];
             for (let j = 0; j < this.points[0].length; j++) {
-                newPoints[this.points[0].length - 1 - j][i] = this.points[i][j];
+                newPoints[j][this.points.length - 1 - i] = this.points[i][j];
             }
         }
 
         this.points = newPoints;
     }
 
-    /// 1 2 3    3 6
-    /// 4 5 6 => 2 5
-    ///          1 4
+    /// 1 2 3    3 6   00 01 02    02(00) 12(01)
+    /// 4 5 6 => 2 5   10 11 12 => 01(10) 11(11)
+    ///          1 4               00(20) 10(21)
     rotateLeft(): void {
-        const newPoints = [];
-        for (let i = this.points[0].length - 1; i >= 0; i--) {
-            newPoints[i] = [];
-            for (let j = 0; j < this.points.length; j++) {
-                newPoints[i][j] = this.points[j][i];
+        console.log('rotate left');
+        const newPoints = (<any>Array(this.points[0].length)).fill(0).map(() => (<any>Array(this.points.length)).fill(0));
+        for (let i = 0; i < this.points.length; i++) {
+            for (let j = 0; j < this.points[0].length; j++) {
+                newPoints[this.points[0].length - 1 - j][i] = this.points[i][j];
             }
         }
 
@@ -92,35 +92,34 @@ class Shape {
 const shapes: Shape[] = [
     new Shape([
         [1, 1],
-        [1, 1]], 'red'),
+        [1, 1]], 'yellow'),
     new Shape([
         [1, 1, 0],
         [0, 1, 1]], 'red'),
     new Shape([
         [0, 1, 1],
-        [1, 1, 0]], 'red'),
+        [1, 1, 0]], 'green'),
     new Shape([
-        [1, 1, 1, 1],
-        [0, 0, 0, 0]], 'red'),
+        [1, 1, 1, 1]], 'magenta'),
     new Shape([
         [1, 1],
         [1, 0],
-        [1, 0]], 'red'),
+        [1, 0]], 'blue'),
     new Shape([
         [1, 1],
         [0, 1],
-        [0, 1]], 'red'),
+        [0, 1]], 'darkblue'),
     new Shape([
         [1, 1, 1],
-        [0, 1, 0]], 'red'),
+        [0, 1, 0]], 'darkgreen'),
 ];
 
 class Tetris {
-    private _fastSpeed = 15; // rows per second
     private _currentSpeed = 1; // rows per second
     private _board: number[][];
     private _score: number = 0;
     private _currentShape: Shape;
+    private _gameOver: boolean = false;
 
     constructor(rows: number, cols: number, score: number = 0) {
         this._board = (<any>Array(rows)).fill(0).map(() => (<any>Array(cols)).fill(0));
@@ -141,7 +140,7 @@ class Tetris {
 
     public down(): void {
         if (this._currentShape) {
-            this._currentShape.setSpeed(this._fastSpeed);
+            this._currentShape.setSpeed(40);
         }
     }
 
@@ -172,8 +171,15 @@ class Tetris {
         this._currentShape.update(ticks);
 
         if (this._currentShape.collision(this._board)) {
+            if (this._currentShape.row === 0) {
+                console.log('Game over!');
+                this._gameOver = true;
+                return;
+            }
             this._copyShapeToBoard(this._currentShape.row - 1, this._currentShape.col, this._currentShape.points);
             this._currentShape = null;
+            this._cleanBoard();
+
         }
     }
 
@@ -183,7 +189,15 @@ class Tetris {
         ctx.clearRect(0, 0, width, height);
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = 'green';
+        ctx.fillText('Score: ' + this._score, 0, height + 15);
+
         ctx.fillStyle = 'white';
+        if (this._gameOver) {
+            ctx.fillStyle = 'red';
+            ctx.fillText('Game over!', 20, height / 2);
+            return;
+        }
 
         for (let i = 0; i < this._board.length; i++) {
             for (let j = 0; j < this._board[0].length; j++) {
@@ -201,6 +215,17 @@ class Tetris {
                     ctx.fillStyle = this._currentShape.color;
                     ctx.fillRect((this._currentShape.col + j) * 10, (this._currentShape.row + i) * 10, 10, 10);
                 }
+            }
+        }
+    }
+
+    private _cleanBoard(): void {
+        for (let i = 0; i < this._board.length; i++) {
+            const full = this._board[i].every(x => x === 1);
+            if (full) {
+                this._board.splice(i, 1);
+                this._board.unshift((<any>Array(this._board[0].length)).fill(0));
+                this._score++;
             }
         }
     }
@@ -275,10 +300,10 @@ class Game {
             this._tetris.down();
         } else if (e.keyCode === 38) {
             this._tetris.rotateRight();
-        } else if (e.keyCode === 17) { // ctrl
-            this._tetris.rotateRight();
-        } else if (e.keyCode === 18) { // alt gr
+        } else if (e.keyCode === 65) { // A
             this._tetris.rotateLeft();
+        } else if (e.keyCode === 83) { // S
+            this._tetris.rotateRight();
         }
     }
 
