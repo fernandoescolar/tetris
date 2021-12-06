@@ -1,15 +1,19 @@
 {
   "name": "tetris",
   "version": "1.0.0",
-  "description": "",
+  "description": "Tetris in TypeScript",
   "main": "index.js",
   "scripts": {
     "tsc": "tsc --watch",
     "start": "rimraf dist && concurrently --kill-others --names tsc,web-dev-server \"npm run tsc\" \"web-dev-server --config web-dev-server.config.js\"",
     "build": "rimraf dist && tsc && rollup -c rollup.config.js"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Fernando Escolar <f.escolar@hotmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fernandoescolar/tetris.git"
+  },
   "devDependencies": {
     "@open-wc/building-rollup": "^2.0.1",
     "@rollup/plugin-json": "^4.1.0",
