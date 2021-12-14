@@ -7,50 +7,55 @@ export default class Board extends Array<Array<number>> {
         }
     }
 
-    get lineHeight(): number {
-        let height = this.length;
-        for (let i = 0; i < this.length; i++) {
-            if (this[i].every(x => x === 0)) {
-                height--;
+    get heights(): number[] {
+        let heights: number[] = [];
+        for (let j = 0; j < this[0].length; j++) {
+            for (let i = 0; i < this.length; i++) {
+                if (this[i][j] === 1) {
+                    heights.push(this.length - i);
+                    break;
+                }
+            }
+
+            if (heights.length < j + 1) {
+                heights.push(0);
             }
         }
 
+        return heights;
+    }
+
+    get height(): number {
+        let height = 0;
+        this.heights.forEach(h => height += h);
         return height;
     }
 
-    /// hole = zero with 1 up
-    /// 1
-    /// 0
-    ///
-    ///  0 1 1
-    ///
-    ///  1 1 0
-    ///
-    ///  1 0 1
     get holes(): number {
         let holes = 0;
-        for (let i = 0; i < this.length; i++) {
-            for (let j = 0; j < this[i].length; j++) {
-                if (this[i][j] === 0 && i > 0 && this[i - 1][j] === 1) {
-                    holes++;
-                    continue;
+        for (let j = 0; j < this[0].length; j++) {
+            let count = false;
+            for (let i = 0; i < this.length; i++) {
+                if (this[i][j] === 1) {
+                    count = true;
                 }
-                if (this[i][j] === 0 && j === 0 && this[i][j + 1] === 1 && this[i][j + 2] === 1) {
+                if (this[i][j] === 0 && count) {
                     holes++;
-                    continue;
-                }
-                if (this[i][j] === 0 && j === this[i].length - 1  && this[i][j - 1] === 1 && this[i][j - 2] === 1) {
-                    holes++;
-                    continue;
-                }
-                if (this[i][j] === 0 && j > 0 && this[i][j + 1] === 1 && this[i][j - 1] === 1) {
-                    holes++;
-                    continue;
                 }
             }
         }
 
         return holes;
+    }
+
+    get bumpiness(): number {
+        const heights = this.heights;
+        let bumpiness = 0;
+        for (let i = 1; i < heights.length; i++) {
+            bumpiness += Math.abs(heights[i - 1] - heights[i]);
+        }
+
+        return bumpiness;
     }
 
     removeFullLines(): number {

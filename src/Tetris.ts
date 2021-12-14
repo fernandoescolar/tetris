@@ -98,7 +98,7 @@ export default class Tetris {
     }
 
     private _getRandomShape() {
-        let type = shapes[Math.floor(this._getRandom(0, shapes.length))];
+        let type = shapes[Math.floor(this._getRandom(0, shapes.length * 2) / 2)];
         return new type(this.board);
     }
 
