@@ -9,9 +9,11 @@ export default class AI {
 
     constructor(
         private tetris: Tetris,
-        private readonly linesFactor: number = 2,
-        private readonly heightFactor: number = 0.1,
-        private readonly holesFactor: number = 1) {
+        private readonly linesFactor: number = 0.760666,
+        private readonly heightFactor: number = 0.51006,
+        private readonly holesFactor: number = 0.35663,
+        private readonly bumpinessFactor: number = 0.184483
+    ) {
     }
 
     update() {
@@ -48,14 +50,14 @@ export default class AI {
                 s.row--;
                 b.copyShapeToBoard(s.row, s.col, s.points);
                 const removedLines = b.removeFullLines();
-                const height = b.lineHeight;
+                const height = b.height;
                 const holes = b.holes;
-                const weight = (removedLines * this.linesFactor) - (b.lineHeight * this.heightFactor) - (b.holes * this.holesFactor);
+                const bumpiness = b.bumpiness;
+                const weight = (removedLines * this.linesFactor) - (height * this.heightFactor) - (holes * this.holesFactor) - (bumpiness * this.bumpinessFactor);
                 b.forEach(line => {
                     console.log(line.join(' '));
                 });
-                console.log(`R: ${removedLines} H: ${height} X: ${holes}`);
-                console.log(`W: ${weight}`);
+                console.log(`R: ${removedLines} H: ${height} X: ${holes} B: ${bumpiness} W: ${weight}`);
                 if (movement === undefined || weight > movement.weight) {
                     console.log(`!replaced: ${movement.weight}`);
                     movement = {
@@ -66,11 +68,11 @@ export default class AI {
                     };
                 }
 
+                s.row = 0;
                 s.right();
             }
 
             s.col = 0;
-            s.row = 0;
             s.rotateRight();
         }
 
@@ -93,7 +95,7 @@ export default class AI {
             this._current.right();
         }
 
-        this._current._speed = 20;
+        this._current._speed = 50;
     }
 }
 
