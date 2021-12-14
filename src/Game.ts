@@ -1,14 +1,16 @@
+import Board from "./Board";
+import CanvasRenderer from "./CanvasRenderer";
 import Tetris from "./Tetris";
 
 export default class Game {
+    private _board: Board;
     private _tetris: Tetris;
-    private _ctx: CanvasRenderingContext2D | null;
     private _last: Date | null = null;
     private _active: boolean = false;
 
     constructor(canvas: HTMLCanvasElement) {
-        this._ctx = canvas.getContext('2d');
-        this._tetris = new Tetris(20, 10, 0);
+        this._board = new Board(20, 10);
+        this._tetris = new Tetris(this._board, new CanvasRenderer(canvas, this._board));
     }
 
     public start() {
@@ -34,7 +36,7 @@ export default class Game {
     }
 
     private _draw() {
-        this._tetris.draw(this._ctx as CanvasRenderingContext2D);
+        this._tetris.draw();
     }
 
     private _keyDown(e: KeyboardEvent) {

@@ -1,10 +1,14 @@
+import Board from "./Board";
+
 export default class Shape {
     public row: number = 0;
     public col: number = 0;
     public _speed: number = 1; // rows per second
     private _delta: number = 0;
 
-    constructor(public points: number[][], readonly color: string) {
+    constructor(public points: number[][], readonly color: string, private readonly board: Board) {
+        this.row = 0;
+        this.col = Math.floor((this.board[0].length - this.points[0].length) / 2);
     }
 
     setSpeed(rowsPerSecond: number) {
@@ -24,12 +28,12 @@ export default class Shape {
         }
     }
 
-    collision(board: number[][]): boolean {
-        return Shape._collision(this.row, this.col, this.points, board);
+    collision(): boolean {
+        return Shape._collision(this.row, this.col, this.points, this.board);
     }
 
-    left(board: number[][]): void {
-        if (Shape._collision(this.row, this.col - 1, this.points, board)){
+    left(): void {
+        if (Shape._collision(this.row, this.col - 1, this.points, this.board)){
             return;
         }
 
@@ -39,14 +43,14 @@ export default class Shape {
         }
     }
 
-    right(board: number[][]): void {
-        if (Shape._collision(this.row, this.col + 1, this.points, board)){
+    right(): void {
+        if (Shape._collision(this.row, this.col + 1, this.points, this.board)){
             return;
         }
 
         this.col++;
-        if (this.col + this.points[0].length > board[0].length) {
-            this.col = board[0].length - this.points[0].length;
+        if (this.col + this.points[0].length > this.board[0].length) {
+            this.col = this.board[0].length - this.points[0].length;
         }
     }
 
@@ -54,8 +58,8 @@ export default class Shape {
     /// 1 2 3     4 1    00 01 02    10(00) 00(01)
     /// 4 5 6  => 5 2    10 11 12 => 11(10) 01(11)
     ///           6 3                12(20) 02(21)
-    rotateRight(board: number[][]): void {
-        if (this.col + this.points.length > board[0].length) {
+    rotateRight(): void {
+        if (this.col + this.points.length > this.board[0].length) {
             return;
         }
 
@@ -66,7 +70,7 @@ export default class Shape {
             }
         }
 
-        if (!Shape._collision(this.row, this.col, newPoints, board)) {
+        if (!Shape._collision(this.row, this.col, newPoints, this.board)) {
             this.points = newPoints;
         }
     }
@@ -74,8 +78,8 @@ export default class Shape {
     /// 1 2 3    3 6   00 01 02    02(00) 12(01)
     /// 4 5 6 => 2 5   10 11 12 => 01(10) 11(11)
     ///          1 4               00(20) 10(21)
-    rotateLeft(board: number[][]): void {
-        if (this.col + this.points.length > board[0].length) {
+    rotateLeft(): void {
+        if (this.col + this.points.length > this.board[0].length) {
             return;
         }
 
@@ -86,9 +90,13 @@ export default class Shape {
             }
         }
 
-        if (!Shape._collision(this.row, this.col, newPoints, board)) {
+        if (!Shape._collision(this.row, this.col, newPoints, this.board)) {
             this.points = newPoints;
         }
+    }
+
+    copyToBoard(): void {
+        this.board.copyShapeToBoard(this.row - 1, this.col, this.points);
     }
 
     private static _collision(row: number, col:number, points: number[][], board: number[][]): boolean {
