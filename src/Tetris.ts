@@ -11,7 +11,11 @@ export default class Tetris {
     private _nextShape: Shape | null = null;
     private _gameOver: boolean = false;
 
-    constructor(private readonly board: Board, private readonly renderer: IRenderer) {
+    constructor(public readonly board: Board, public readonly renderer: IRenderer) {
+    }
+
+    get currentShape() {
+        return this._currentShape;
     }
 
     public left(): void {

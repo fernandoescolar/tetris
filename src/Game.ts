@@ -1,3 +1,4 @@
+import AI from "./AI";
 import Board from "./Board";
 import CanvasRenderer from "./CanvasRenderer";
 import Tetris from "./Tetris";
@@ -7,10 +8,12 @@ export default class Game {
     private _tetris: Tetris;
     private _last: Date | null = null;
     private _active: boolean = false;
+    private _ai: AI;
 
     constructor(canvas: HTMLCanvasElement) {
         this._board = new Board(20, 10);
         this._tetris = new Tetris(this._board, new CanvasRenderer(canvas, this._board));
+        this._ai = new AI(this._tetris);
     }
 
     public start() {
@@ -29,6 +32,7 @@ export default class Game {
 
         this._last = now;
         this._draw();
+        this._ai.update();
 
         if (this._active) {
             window.requestAnimationFrame(() => this._step());

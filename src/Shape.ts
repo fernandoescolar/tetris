@@ -99,6 +99,15 @@ export default class Shape {
         this.board.copyShapeToBoard(this.row - 1, this.col, this.points);
     }
 
+    clone() : Shape {
+        const points = this.points.map(arr => arr.slice());
+        const copy = new Shape(points, this.color, this.board);
+        copy.row = this.row;
+        copy.col = this.col;
+        copy._speed = this._speed;
+        return copy;
+    }
+
     private static _collision(row: number, col:number, points: number[][], board: number[][]): boolean {
         for (let i = 0; i < points.length; i++) {
             for (let j = 0; j < points[0].length; j++) {
